@@ -1,0 +1,43 @@
+MALAVIKA LOGANATHAN
+AI ENGINEER | FULL-STACK DEVELOPER | PRODUCT BUILDER
+
+CONTACT
+Email: malz311204@gmail.com
+GitHub: https://github.com/Mxlzz31
+LinkedIn: https://www.linkedin.com/in/malavika-l-a7663b256/
+
+EDUCATION
+Chennai Institute of Technology
+B.E. in Computer Science and Engineering | November 2022 - March 2026
+GPA: 8.78 / 10
+
+Relevant coursework: Data Structures, Algorithms, Operating Systems, Database Design, Agile Methods, SDLC.
+
+EXPERIENCE
+Associate Product Engineer - Predigle | June 2026 - Present
+Engineered scalable full-stack product solutions using Angular, Django, Python, TypeScript, MongoDB, and Firebase. Improved vessel tracking, mapping, social networking, and platform performance.
+
+Full Stack Developer Intern - Predigle | December 2025 - Present
+Developed and optimized backend APIs for the Esperwave social platform. Improved performance and scalability by 40% through MongoDB query optimization and contributed to feeds, chat, and engagement systems.
+
+AI Research Intern - Proglint | June 2025 - October 2025
+Built and deployed computer vision models for QSR, manufacturing, and medical applications. Developed APIs for 5+ manufacturing use cases and built a DeepStream inference pipeline processing 60+ FPS video streams.
+
+PROJECTS
+Real-Time Video Call Translation
+Built a real-time translation system with 90% accuracy across 10+ languages using Whisper AI, PyTorch, WebRTC, Node.js, React, and Flask. Reduced latency by 40%.
+
+CropCast
+Built an LSTM-based crop yield forecasting model achieving 85% accuracy and integrated a Chart.js visualization dashboard deployed on Render.
+
+Sleep Staging Using EEG Signals
+Developed a CNN and Transformer-based sleep staging model with F1 82.7, Kappa 76.9, and balanced accuracy 76.7 on Sleep-EDF and multichannel datasets.
+
+Eye Disease Classification with ViT
+Developed a ViT-B16 model for multi-class fundus image classification covering glaucoma, cataract, and diabetic retinopathy, achieving 92% accuracy.
+
+TECHNICAL SKILLS
+Languages: Python, C/C++, JavaScript, TypeScript, HTML/CSS
+Frameworks: React.js, Node.js, Flask, Django, PyTorch, TensorFlow, OpenCV, DeepStream, Firebase
+Tools: MySQL, MongoDB, Git, Docker, Selenium, Linux/Unix, Cucumber, REST API, PostgreSQL
+Spoken languages: English, Hindi, Japanese, Tamil, Telugu

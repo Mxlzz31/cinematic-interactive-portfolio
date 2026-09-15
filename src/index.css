@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Manrope', sans-serif;
+  --font-mono: 'Manrope', sans-serif;
+}
+
+.font-display {
+  font-family: 'Manrope', sans-serif;
+}
+
+.font-mono {
+  font-family: 'Manrope', sans-serif !important;
+}
+
+.blue-label {
+  color: #26A7FF;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+
+::selection {
+  background: #26A7FF;
+  color: #07070A;
+}
+
+::-webkit-scrollbar {
+  width: 2px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(38, 167, 255, 0.35);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: #07070A;
+}
+
+body {
+  background: #07070A;
+  color: #FFF7FC;
+  font-family: 'Manrope', sans-serif;
+  overflow-x: hidden;
+}
+
+@keyframes scroll-indicator {
+  0%   { transform: translateY(-200%); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateY(350%); opacity: 0; }
+}
+.animate-scroll-indicator {
+  animation: scroll-indicator 2s ease-in-out infinite;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-slide {
+  animation: fadeSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
