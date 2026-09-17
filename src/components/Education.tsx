@@ -30,7 +30,7 @@ export default function Education() {
           </div>
 
           <div>
-            <div className="mb-3 font-sans text-xs font-extrabold uppercase tracking-[0.16em] text-white/55">
+            <div className="mb-3 font-sans text-xs font-extrabold uppercase tracking-[0.16em] text-white/70">
               Relevant coursework
             </div>
             <div className="flex flex-wrap gap-2">

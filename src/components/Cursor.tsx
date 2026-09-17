@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Particle {
   x: number
@@ -9,18 +9,48 @@ interface Particle {
   vy: number
 }
 
+interface MagnetTarget {
+  cx: number
+  cy: number
+}
+
+const MAGNET_RADIUS = 110
+
 export default function Cursor() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const dotRef = useRef<HTMLDivElement>(null)
+  const dotScaleRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
+  const ringScaleRef = useRef<HTMLDivElement>(null)
   const mouse = useRef({ x: -400, y: -400 })
-  const dotPos = useRef({ x: -400, y: -400 })
   const ringPos = useRef({ x: -400, y: -400 })
   const particles = useRef<Particle[]>([])
   const raf = useRef(0)
-  const isDown = useRef(false)
+
+  const [enabled, setEnabled] = useState(false)
+
+  // Pointer-driven only: no custom cursor on touch, or when motion is reduced.
+  useEffect(() => {
+    const fine = window.matchMedia('(pointer: fine)')
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const sync = () => setEnabled(fine.matches && !still.matches)
+    sync()
+    fine.addEventListener('change', sync)
+    still.addEventListener('change', sync)
+    return () => {
+      fine.removeEventListener('change', sync)
+      still.removeEventListener('change', sync)
+    }
+  }, [])
+
+  // Hide the native pointer only while the custom one is live.
+  useEffect(() => {
+    document.documentElement.classList.toggle('custom-cursor', enabled)
+    return () => document.documentElement.classList.remove('custom-cursor')
+  }, [enabled])
 
   useEffect(() => {
+    if (!enabled) return
     const canvas = canvasRef.current!
     const ctx = canvas.getContext('2d')!
 
@@ -29,28 +59,40 @@ export default function Cursor() {
       canvas.height = window.innerHeight
     }
     resize()
-    window.addEventListener('resize', resize, { passive: true })
 
-    const onMove = (e: MouseEvent) => {
-      let mx = e.clientX
-      let my = e.clientY
-
-      // Magnetic pull toward [data-magnetic] elements
-      document.querySelectorAll<HTMLElement>('[data-magnetic]').forEach(el => {
+    // Magnet centres are cached: measuring every [data-magnetic] element on
+    // every mousemove forced a layout per event, which is what made this drag.
+    let magnets: MagnetTarget[] = []
+    const measureMagnets = () => {
+      magnets = Array.from(document.querySelectorAll<HTMLElement>('[data-magnetic]')).map(el => {
         const r = el.getBoundingClientRect()
-        const cx = r.left + r.width / 2
-        const cy = r.top + r.height / 2
-        const dist = Math.hypot(e.clientX - cx, e.clientY - cy)
-        if (dist < 110) {
-          const f = (1 - dist / 110) * 0.38
-          mx += (cx - e.clientX) * f
-          my += (cy - e.clientY) * f
-        }
+        return { cx: r.left + r.width / 2, cy: r.top + r.height / 2 }
       })
+    }
+    measureMagnets()
 
-      mouse.current = { x: mx, y: my }
+    let remeasureQueued = false
+    const queueRemeasure = () => {
+      if (remeasureQueued) return
+      remeasureQueued = true
+      requestAnimationFrame(() => {
+        remeasureQueued = false
+        measureMagnets()
+      })
+    }
 
-      // Spawn particles
+    const onResize = () => {
+      resize()
+      queueRemeasure()
+    }
+    window.addEventListener('resize', onResize, { passive: true })
+    window.addEventListener('scroll', queueRemeasure, { passive: true })
+
+    // The move handler now only records the pointer and spawns particles.
+    const onMove = (e: MouseEvent) => {
+      mouse.current.x = e.clientX
+      mouse.current.y = e.clientY
+
       if (Math.random() > 0.35) {
         particles.current.push({
           x: e.clientX + (Math.random() - 0.5) * 8,
@@ -64,19 +106,14 @@ export default function Cursor() {
       }
     }
 
+    // Scale and colour live on inner elements so they can transition without
+    // fighting the transform that positions the outer ones every frame.
     const setHover = (on: boolean) => {
-      if (!dotRef.current || !ringRef.current) return
-      if (on) {
-        dotRef.current.style.transform = 'translate(-50%, -50%) scale(0)'
-        dotRef.current.style.opacity = '0'
-        ringRef.current.style.transform = 'translate(-50%, -50%) scale(2)'
-        ringRef.current.style.borderColor = 'rgba(200, 255, 0, 0.9)'
-      } else {
-        dotRef.current.style.transform = 'translate(-50%, -50%) scale(1)'
-        dotRef.current.style.opacity = '1'
-        ringRef.current.style.transform = 'translate(-50%, -50%) scale(1)'
-        ringRef.current.style.borderColor = 'rgba(200, 255, 0, 0.45)'
-      }
+      if (!dotScaleRef.current || !ringScaleRef.current) return
+      dotScaleRef.current.style.transform = on ? 'scale(0)' : 'scale(1)'
+      dotScaleRef.current.style.opacity = on ? '0' : '1'
+      ringScaleRef.current.style.transform = on ? 'scale(2)' : 'scale(1)'
+      ringScaleRef.current.style.borderColor = on ? 'rgba(38, 167, 255, 0.95)' : 'rgba(38, 167, 255, 0.45)'
     }
 
     const onOver = (e: MouseEvent) => {
@@ -86,12 +123,10 @@ export default function Cursor() {
       if ((e.target as HTMLElement).closest('a, button, [data-hover]')) setHover(false)
     }
     const onDown = () => {
-      isDown.current = true
-      if (ringRef.current) ringRef.current.style.transform = 'translate(-50%, -50%) scale(0.8)'
+      if (ringScaleRef.current) ringScaleRef.current.style.transform = 'scale(0.8)'
     }
     const onUp = () => {
-      isDown.current = false
-      if (ringRef.current) ringRef.current.style.transform = 'translate(-50%, -50%) scale(1)'
+      if (ringScaleRef.current) ringScaleRef.current.style.transform = 'scale(1)'
     }
 
     window.addEventListener('mousemove', onMove, { passive: true })
@@ -101,22 +136,33 @@ export default function Cursor() {
     window.addEventListener('mouseup', onUp)
 
     const tick = () => {
-      // Lerp positions
-      dotPos.current.x += (mouse.current.x - dotPos.current.x) * 0.2
-      dotPos.current.y += (mouse.current.y - dotPos.current.y) * 0.2
-      ringPos.current.x += (mouse.current.x - ringPos.current.x) * 0.09
-      ringPos.current.y += (mouse.current.y - ringPos.current.y) * 0.09
+      const mx = mouse.current.x
+      const my = mouse.current.y
 
+      // The dot sits exactly on the pointer - no easing, no magnet offset.
       if (dotRef.current) {
-        dotRef.current.style.left = `${dotPos.current.x}px`
-        dotRef.current.style.top = `${dotPos.current.y}px`
-      }
-      if (ringRef.current) {
-        ringRef.current.style.left = `${ringPos.current.x}px`
-        ringRef.current.style.top = `${ringPos.current.y}px`
+        dotRef.current.style.transform = `translate3d(${mx}px, ${my}px, 0)`
       }
 
-      // Draw particles
+      // Only the trailing ring is pulled toward magnetic targets, so the
+      // effect survives without the dot ever drifting off the real pointer.
+      let tx = mx
+      let ty = my
+      for (const m of magnets) {
+        const dist = Math.hypot(mx - m.cx, my - m.cy)
+        if (dist < MAGNET_RADIUS) {
+          const f = (1 - dist / MAGNET_RADIUS) * 0.38
+          tx += (m.cx - mx) * f
+          ty += (m.cy - my) * f
+        }
+      }
+
+      ringPos.current.x += (tx - ringPos.current.x) * 0.22
+      ringPos.current.y += (ty - ringPos.current.y) * 0.22
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${ringPos.current.x}px, ${ringPos.current.y}px, 0)`
+      }
+
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       particles.current = particles.current.filter(p => p.life > 0.01)
 
@@ -132,59 +178,69 @@ export default function Cursor() {
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(200, 255, 0, ${p.life * 0.65})`
+        ctx.fillStyle = `rgba(38, 167, 255, ${p.life * 0.65})`
         ctx.fill()
       }
 
       raf.current = requestAnimationFrame(tick)
     }
-    tick()
+    raf.current = requestAnimationFrame(tick)
 
     return () => {
       cancelAnimationFrame(raf.current)
-      window.removeEventListener('resize', resize)
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('scroll', queueRemeasure)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseover', onOver)
       window.removeEventListener('mouseout', onOut)
       window.removeEventListener('mousedown', onDown)
       window.removeEventListener('mouseup', onUp)
     }
-  }, [])
+  }, [enabled])
+
+  if (!enabled) return null
 
   return (
     <>
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 pointer-events-none z-[9999]"
-      />
+      <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[9999]" />
+
       <div
         ref={dotRef}
-        className="fixed pointer-events-none z-[9998]"
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: '50%',
-          background: '#26A7FF',
-          transform: 'translate(-50%, -50%)',
-          transition: 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease',
-          left: -400,
-          top: -400,
-        }}
-      />
+        className="pointer-events-none fixed left-0 top-0 z-[9998]"
+        style={{ transform: 'translate3d(-400px, -400px, 0)', willChange: 'transform' }}
+      >
+        <div
+          ref={dotScaleRef}
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            background: '#26A7FF',
+            marginLeft: -4,
+            marginTop: -4,
+            transition: 'transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease',
+          }}
+        />
+      </div>
+
       <div
         ref={ringRef}
-        className="fixed pointer-events-none z-[9997]"
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: '50%',
-          border: '1px solid rgba(200, 255, 0, 0.45)',
-          transform: 'translate(-50%, -50%)',
-          transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s ease',
-          left: -400,
-          top: -400,
-        }}
-      />
+        className="pointer-events-none fixed left-0 top-0 z-[9997]"
+        style={{ transform: 'translate3d(-400px, -400px, 0)', willChange: 'transform' }}
+      >
+        <div
+          ref={ringScaleRef}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: '50%',
+            border: '1px solid rgba(38, 167, 255, 0.45)',
+            marginLeft: -20,
+            marginTop: -20,
+            transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1), border-color 0.25s ease',
+          }}
+        />
+      </div>
     </>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
+
 interface GridNode {
   x: number
   y: number
@@ -24,6 +25,7 @@ export default function Hero() {
     const t = setTimeout(() => setRevealed(true), 150)
     return () => clearTimeout(t)
   }, [])
+
 
   useEffect(() => {
     const canvas = canvasRef.current!
@@ -238,7 +240,7 @@ export default function Hero() {
 
       {/* Main content */}
       <div className="relative z-10 h-full flex items-center px-10 sm:px-16 lg:px-24">
-        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-10 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="mx-auto w-full max-w-5xl">
           <div
             className="transition-all duration-700"
             style={{
@@ -310,20 +312,6 @@ export default function Hero() {
             </div>
           </div>
 
-          <div
-            className="relative h-[360px] sm:h-[420px] w-full max-w-[520px] justify-self-end"
-            style={{
-              opacity: revealed ? 1 : 0,
-              transform: revealed ? 'translateY(0)' : 'translateY(18px)',
-              transitionDelay: delay(220),
-            }}
-          >
-            <div className="absolute inset-y-8 right-8 w-[72%] rounded-[32px] border border-[#EEEAE0]/8 bg-gradient-to-br from-[#0d0d12] via-[#12161d] to-[#0a0a0d] shadow-[0_30px_80px_rgba(0,0,0,0.35)]" />
-            <div className="absolute left-8 bottom-8 h-52 w-52 rounded-[28px] border border-[#26A7FF]/25 bg-[#26A7FF]/10 backdrop-blur-sm" />
-            <div className="absolute right-20 top-12 h-28 w-28 rounded-full border border-[#EEEAE0]/10 bg-[#EEEAE0]/5" />
-            <div className="absolute right-10 bottom-14 h-20 w-20 rounded-full bg-[#26A7FF]/20 blur-xl" />
-            <div className="absolute left-20 top-20 h-28 w-28 rounded-full border border-[#EEEAE0]/10 bg-white/[0.03]" />
-          </div>
         </div>
       </div>
 

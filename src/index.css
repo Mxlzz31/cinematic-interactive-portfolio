@@ -3,7 +3,7 @@
 
 @theme {
   --font-sans: 'Manrope', sans-serif;
-  --font-mono: 'Manrope', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
 }
 
 .font-display {
@@ -11,7 +11,13 @@
 }
 
 .font-mono {
-  font-family: 'Manrope', sans-serif !important;
+  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+}
+
+/* Set by <Cursor /> only on fine-pointer devices with motion enabled. */
+.custom-cursor,
+.custom-cursor * {
+  cursor: none;
 }
 
 .blue-label {

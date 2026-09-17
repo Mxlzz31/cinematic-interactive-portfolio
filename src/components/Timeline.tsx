@@ -19,7 +19,7 @@ const EXPERIENCES = [
     company: 'Predigle',
     location: 'Remote',
     description:
-      'Developed and maintained backend APIs for the Esperwave platform, a social application focused on sharing boating tips. Designed and optimized APIs using MongoDB query optimization to improve performance and scalability by 40%.',
+      'Developed and maintained backend APIs for the Esperwave platform, a social application focused on sharing boating tips. Cut response times on the heaviest feed endpoints by restructuring MongoDB queries into aggregation pipelines and adding the indexes they needed.',
     achievement: 'Collaborated on social features including user interactions, feeds, chat, and engagement systems',
     tech: ['MongoDB', 'API Design', 'Node.js', 'JavaScript', 'Backend Engineering'],
     color: '#178CE0',
@@ -126,7 +126,7 @@ export default function Timeline() {
 
                   <div className="pt-5">
                     <div
-                      className={i === active ? 'blue-label uppercase mb-1.5' : 'font-sans text-xs font-semibold uppercase mb-1.5 text-white/35'}
+                      className={i === active ? 'blue-label uppercase mb-1.5' : 'font-sans text-xs font-semibold uppercase mb-1.5 text-white/60'}
                     >
                       {e.period}
                     </div>
@@ -134,14 +134,14 @@ export default function Timeline() {
                       className="font-display font-bold uppercase leading-tight transition-colors duration-300"
                       style={{
                         fontSize: 'clamp(18px, 2vw, 24px)',
-                        color: i === active ? '#EEEAE0' : 'rgba(238,234,224,0.32)',
+                        color: i === active ? '#EEEAE0' : 'rgba(238,234,224,0.6)',
                       }}
                     >
                       {e.role}
                     </div>
                     <div
                       className="font-mono text-[10px] tracking-[0.12em] mt-1 transition-colors duration-300"
-                      style={{ color: i === active ? 'rgba(238,234,224,0.5)' : 'rgba(238,234,224,0.2)' }}
+                      style={{ color: i === active ? 'rgba(238,234,224,0.5)' : 'rgba(238,234,224,0.55)' }}
                     >
                       {e.company}
                     </div>
@@ -168,7 +168,7 @@ export default function Timeline() {
                 {exp.role}
               </h3>
 
-              <div className="font-mono text-[11px] tracking-[0.15em] uppercase text-[#EEEAE0]/38 mb-8">
+              <div className="font-mono text-[11px] tracking-[0.15em] uppercase text-[#EEEAE0]/65 mb-8">
                 {exp.company} · {exp.location}
               </div>
 
@@ -198,7 +198,7 @@ export default function Timeline() {
                   {exp.tech.map(t => (
                     <span
                       key={t}
-                      className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] uppercase px-3 py-1.5 text-[#EEEAE0]/38"
+                      className="font-mono text-[9px] sm:text-[10px] tracking-[0.12em] uppercase px-3 py-1.5 text-[#EEEAE0]/65"
                       style={{ border: '1px solid rgba(238,234,224,0.1)' }}
                     >
                       {t}

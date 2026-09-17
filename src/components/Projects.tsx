@@ -16,6 +16,12 @@ const PROJECTS = [
     accent: '#26A7FF',
     tags: ['Whisper AI', 'PyTorch', 'NodeJS', 'ReactJS', 'Flask', 'JavaScript'],
     repoUrl: 'https://github.com/Sidhartha-s-935/Videocall_translation',
+    demoUrl: 'https://www.youtube.com/watch?v=sqxjYGoxZUg',
+    demoLabel: 'Watch demo',
+    image: 'https://img.youtube.com/vi/sqxjYGoxZUg/maxresdefault.jpg',
+    imageFit: 'cover',
+    imageCaption: '',
+    team: true,
   },
   {
     index: '02',
@@ -32,6 +38,12 @@ const PROJECTS = [
     accent: '#178CE0',
     tags: ['LSTM', 'Flask', 'Python', 'Chart.js', 'Render'],
     repoUrl: 'https://github.com/Sidhartha-s-935/CropCast',
+    demoUrl: 'https://cropcast.onrender.com/',
+    demoLabel: 'Live demo',
+    image: '/projects/cropcast.png',
+    imageFit: 'cover',
+    imageCaption: '',
+    team: true,
   },
   {
     index: '03',
@@ -48,6 +60,12 @@ const PROJECTS = [
     accent: '#6BCBFF',
     tags: ['Python', 'PyTorch', 'NumPy', 'Matplotlib', 'Scikit-Learn', 'mne'],
     repoUrl: 'https://github.com/Mxlzz31/sleep',
+    demoUrl: '',
+    demoLabel: '',
+    image: '/projects/sleep-staging-confusion.png',
+    imageFit: 'contain',
+    imageCaption: 'Confusion matrix - 5-class staging, weighted F1 0.827',
+    team: false,
   },
   {
     index: '04',
@@ -64,8 +82,16 @@ const PROJECTS = [
     accent: '#8ED8FF',
     tags: ['Python', 'PyTorch', 'timm', 'torchvision'],
     repoUrl: 'https://github.com/Mxlzz31/eye_disease_classification',
+    demoUrl: '',
+    demoLabel: '',
+    image: '/projects/eye-disease-confusion.png',
+    imageFit: 'contain',
+    imageCaption: 'Confusion matrix - 4-class fundus classification',
+    team: false,
   },
 ]
+
+type Project = (typeof PROJECTS)[number]
 
 interface Tilt {
   rx: number
@@ -74,10 +100,43 @@ interface Tilt {
   gy: number
 }
 
-function ProjectCard({ project, visible }: { project: (typeof PROJECTS)[0]; visible: boolean }) {
+/** Abstract fallback panel for projects with no capture of their own yet. */
+function PlaceholderArt({ project }: { project: Project }) {
+  return (
+    <>
+      <div
+        className="absolute inset-0 opacity-70"
+        style={{
+          background: `radial-gradient(circle at 28% 38%, ${project.accent}44, transparent 24%), linear-gradient(125deg, ${project.accent}12, transparent 55%)`,
+        }}
+      />
+      <div className="absolute inset-x-5 top-1/2 h-px" style={{ background: `${project.accent}66` }} />
+      <div
+        className="absolute inset-y-5 left-[18%] w-px"
+        style={{ background: `${project.accent}55`, transform: `rotate(${project.index === '03' ? '-20deg' : '24deg'})` }}
+      />
+      <div className="absolute inset-y-5 left-1/2 w-px" style={{ background: `${project.accent}55`, transform: 'rotate(-34deg)' }} />
+      <div className="absolute inset-y-5 right-[18%] w-px" style={{ background: `${project.accent}55`, transform: 'rotate(22deg)' }} />
+      <div className="absolute bottom-4 left-5 blue-label uppercase" style={{ color: project.accent }}>
+        {project.index}
+      </div>
+      <div className="absolute right-5 top-4 grid grid-cols-3 gap-1">
+        {[1, 2, 3, 4, 5, 6].map(dot => (
+          <span key={dot} className="h-1.5 w-1.5 rounded-full" style={{ background: project.accent, opacity: 0.25 + dot * 0.1 }} />
+        ))}
+      </div>
+    </>
+  )
+}
+
+function ProjectCard({ project, visible }: { project: Project; visible: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   const [tilt, setTilt] = useState<Tilt>({ rx: 0, ry: 0, gx: 50, gy: 50 })
   const [hovered, setHovered] = useState(false)
+  const [imageFailed, setImageFailed] = useState(false)
+  const isFigure = project.imageFit === 'contain'
+  const thumbHref = project.demoUrl || project.repoUrl
+  const thumbLabel = project.demoLabel || 'View repo'
 
   const onMove = (e: React.MouseEvent) => {
     const r = ref.current!.getBoundingClientRect()
@@ -101,84 +160,146 @@ function ProjectCard({ project, visible }: { project: (typeof PROJECTS)[0]; visi
   return (
     <div
       ref={ref}
-      data-hover
       onMouseMove={onMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={onLeave}
-      onClick={() => window.open(project.repoUrl, '_blank', 'noopener,noreferrer')}
-      onKeyDown={event => {
-        if (event.key === 'Enter' || event.key === ' ') window.open(project.repoUrl, '_blank', 'noopener,noreferrer')
-      }}
-      role="button"
-      tabIndex={0}
-      className="relative h-[470px] min-h-0 cursor-pointer overflow-hidden transition-all duration-700"
+      className="relative flex h-full flex-col overflow-hidden"
       style={{
         background: '#0B0B10',
         transform: `perspective(1100px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(${hovered ? 1.015 : 1})`,
         transition: hovered
           ? 'transform 0.12s ease'
           : 'transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.8s ease',
-        transformStyle: 'preserve-3d',
         opacity: visible ? 1 : 0,
       }}
     >
-      <div className="absolute inset-0" style={{ perspective: '1200px' }}>
-        <div
-          className="relative h-full w-full"
-          style={{ transformStyle: 'preserve-3d' }}
+      <div className="absolute inset-x-0 top-0 z-10 h-1" style={{ background: project.accent, opacity: hovered ? 1 : 0.65 }} />
+      <div
+        className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-300"
+        style={{
+          opacity: hovered ? 1 : 0,
+          background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, ${project.accent}18 0%, transparent 58%)`,
+        }}
+      />
+
+      <div className="relative z-20 flex h-full flex-col p-5 sm:p-7">
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <span className="blue-label uppercase">{project.index}</span>
+          <span className="blue-label text-right uppercase tracking-[0.08em]">
+            {project.category} · {project.year}
+          </span>
+        </div>
+
+        <figure className="mb-6">
+          <a
+            href={thumbHref}
+            target="_blank"
+            rel="noreferrer"
+            data-hover
+            aria-label={`${project.title} - ${thumbLabel}`}
+            className="group relative block overflow-hidden border border-white/10 transition-colors duration-300 hover:border-white/35"
+            style={{
+              // Charts are plotted 4:3 on white; a 16:9 crop would letterbox them small.
+              aspectRatio: isFigure ? '4 / 3' : '16 / 9',
+              background: isFigure ? '#FFFFFF' : '#07070A',
+            }}
+          >
+            {project.image && !imageFailed ? (
+              <img
+                src={project.image}
+                alt={project.imageCaption || `${project.title} preview`}
+                onError={() => setImageFailed(true)}
+                className="h-full w-full transition-transform duration-700"
+                style={{
+                  objectFit: isFigure ? 'contain' : 'cover',
+                  objectPosition: isFigure ? 'center' : 'top',
+                  padding: isFigure ? '6px' : 0,
+                  transform: hovered && !isFigure ? 'scale(1.04)' : 'scale(1)',
+                }}
+              />
+            ) : (
+              <PlaceholderArt project={project} />
+            )}
+
+            {/* Affordance: the thumbnail is a link, so say where it goes. */}
+            <span className="pointer-events-none absolute inset-0 bg-[#07070A]/0 transition-colors duration-300 group-hover:bg-[#07070A]/45" />
+            <span
+              className="pointer-events-none absolute bottom-3 left-3 translate-y-1 px-2.5 py-1.5 font-sans text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#07070A] opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+              style={{ background: project.accent }}
+            >
+              {thumbLabel} ↗
+            </span>
+          </a>
+          {project.imageCaption && !imageFailed && (
+            <figcaption className="mt-2 font-sans text-[10px] font-semibold uppercase tracking-[0.1em] text-white/55">
+              {project.imageCaption}
+            </figcaption>
+          )}
+        </figure>
+
+        <h3
+          className="font-display font-extrabold uppercase leading-[0.98] text-[#EEEAE0]"
+          style={{ fontSize: 'clamp(24px, 2.5vw, 36px)', letterSpacing: '-0.025em' }}
         >
-          <div className="absolute inset-0 p-5 sm:p-7" style={{ backfaceVisibility: 'hidden' }}>
-            <div className="absolute inset-x-0 top-0 h-1" style={{ background: project.accent, opacity: hovered ? 1 : 0.65 }} />
-            <div
-              className="pointer-events-none absolute inset-0 transition-opacity duration-300"
-              style={{ opacity: hovered ? 1 : 0, background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, ${project.accent}18 0%, transparent 58%)` }}
-            />
-            <div className="relative flex h-full flex-col">
-              <div className="mb-6 flex items-start justify-between">
-                <span className="blue-label uppercase">{project.index}</span>
-                <span className="blue-label uppercase tracking-[0.08em]">
-                  {project.category} · {project.year}
-                </span>
-              </div>
+          {project.title}
+        </h3>
 
-              <div className="relative mb-6 h-[112px] overflow-hidden border border-white/10 bg-[#07070A]">
-                <div className="absolute inset-0 opacity-70" style={{ background: `radial-gradient(circle at 28% 38%, ${project.accent}44, transparent 24%), linear-gradient(125deg, ${project.accent}12, transparent 55%)` }} />
-                <div className="absolute inset-x-5 top-1/2 h-px" style={{ background: `${project.accent}66` }} />
-                <div className="absolute inset-y-5 left-[18%] w-px" style={{ background: `${project.accent}55`, transform: `rotate(${project.index === '03' ? '-20deg' : '24deg'})` }} />
-                <div className="absolute inset-y-5 left-1/2 w-px" style={{ background: `${project.accent}55`, transform: 'rotate(-34deg)' }} />
-                <div className="absolute inset-y-5 right-[18%] w-px" style={{ background: `${project.accent}55`, transform: 'rotate(22deg)' }} />
-                <div className="absolute bottom-4 left-5 blue-label uppercase" style={{ color: project.accent }}>{project.index}</div>
-                <div className="absolute right-5 top-4 grid grid-cols-3 gap-1">
-                  {[1, 2, 3, 4, 5, 6].map(dot => <span key={dot} className="h-1.5 w-1.5 rounded-full" style={{ background: project.accent, opacity: 0.25 + dot * 0.1 }} />)}
-                </div>
-              </div>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <p className="font-sans text-sm font-semibold leading-relaxed text-white/75">{project.subtitle}</p>
+          {project.team && (
+            <span className="border border-white/20 px-2 py-0.5 font-sans text-[9px] font-bold uppercase tracking-[0.1em] text-white/60">
+              Team project
+            </span>
+          )}
+        </div>
 
-              <h3 className="h-[70px] overflow-hidden font-display font-extrabold uppercase leading-[0.98] text-[#EEEAE0]" style={{ fontSize: 'clamp(24px, 2.5vw, 36px)', letterSpacing: '-0.025em' }}>
-                {project.title}
-              </h3>
-              <p className="mt-4 h-[36px] overflow-hidden font-sans font-semibold text-sm leading-relaxed text-white/75">{project.subtitle}</p>
-              <p className="mt-4 max-w-2xl font-sans text-[13px] font-medium leading-relaxed text-white/80">{project.description}</p>
+        <p className="mt-4 max-w-2xl font-sans text-[13px] font-medium leading-relaxed text-white/80">{project.description}</p>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {project.tags.map(tag => (
-                  <span key={tag} className="border px-2 py-1 font-sans text-[9px] font-bold uppercase tracking-[0.06em] text-white/75" style={{ borderColor: `${project.accent}55` }}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {project.tags.map(tag => (
+            <span
+              key={tag}
+              className="border px-2 py-1 font-sans text-[9px] font-bold uppercase tracking-[0.06em] text-white/75"
+              style={{ borderColor: `${project.accent}55` }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
 
-              <div className="mt-5 flex items-end justify-between border-t border-[#EEEAE0]/10 pt-4">
-                <div>
-                  <div className="font-display font-extrabold text-2xl leading-none" style={{ color: project.accent }}>
-                    {project.metric}<span className="ml-1 text-sm uppercase opacity-75">{project.metricUnit}</span>
-                  </div>
-                  <div className="blue-label mt-2 uppercase tracking-[0.08em]">{project.metricLabel}</div>
-                </div>
-                <span className="font-sans text-[11px] font-extrabold uppercase tracking-[0.06em]" style={{ color: project.accent }}>Open GitHub ↗</span>
-              </div>
+        {/* Push the metric row to the bottom so cards in a row line up. */}
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-4 border-t border-[#EEEAE0]/10 pt-4">
+          <div>
+            <div className="font-display text-2xl font-extrabold leading-none" style={{ color: project.accent }}>
+              {project.metric}
+              <span className="ml-1 text-sm uppercase opacity-75">{project.metricUnit}</span>
             </div>
+            <div className="blue-label mt-2 uppercase tracking-[0.08em]">{project.metricLabel}</div>
           </div>
 
+          <div className="flex items-center gap-4">
+            {project.demoUrl && (
+              <a
+                href={project.demoUrl}
+                target="_blank"
+                rel="noreferrer"
+                data-hover
+                className="font-sans text-[11px] font-extrabold uppercase tracking-[0.06em] underline-offset-4 hover:underline"
+                style={{ color: project.accent }}
+              >
+                {project.demoLabel} ↗
+              </a>
+            )}
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noreferrer"
+              data-hover
+              className="font-sans text-[11px] font-extrabold uppercase tracking-[0.06em] text-white/65 underline-offset-4 transition-colors hover:text-white hover:underline"
+            >
+              GitHub ↗
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -220,14 +341,14 @@ export default function Projects() {
               Projects
             </h2>
           </div>
-          <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#EEEAE0]/22 pb-2">
+          <span className="font-mono text-[9px] tracking-[0.2em] uppercase text-[#EEEAE0]/55 pb-2">
             4 projects
           </span>
         </div>
 
-        <div ref={ref} className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div ref={ref} className="grid grid-cols-1 items-stretch gap-5 md:grid-cols-2">
           {PROJECTS.map((project, index) => (
-            <div key={project.id} style={{ transitionDelay: `${index * 100}ms` }}>
+            <div key={project.id} className="h-full" style={{ transitionDelay: `${index * 100}ms` }}>
               <ProjectCard project={project} visible={visible} />
             </div>
           ))}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import PhysicsField from './PhysicsField'
 
 const TECH_STACK = [
@@ -37,28 +37,14 @@ const TECH_STACK = [
 ]
 
 export default function Metrics() {
-  const ref = useRef<HTMLDivElement>(null)
   const [activeIndex, setActiveIndex] = useState(0)
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          obs.disconnect()
-        }
-      },
-      { threshold: 0.2 }
-    )
-    if (ref.current) obs.observe(ref.current)
-    return () => obs.disconnect()
-  }, [])
 
   const selectCluster = (index: number) => {
     setActiveIndex(index)
   }
 
   return (
-    <section id="techstack" ref={ref} className="relative overflow-hidden px-10 sm:px-16 lg:px-24 py-24 sm:py-32 bg-[radial-gradient(circle_at_50%_10%,rgba(38,167,255,0.18),transparent_30%),#07070A]">
+    <section id="techstack" className="relative overflow-hidden px-10 sm:px-16 lg:px-24 py-24 sm:py-32 bg-[radial-gradient(circle_at_50%_10%,rgba(38,167,255,0.18),transparent_30%),#07070A]">
       <PhysicsField variant="flow" />
       <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mb-12 sm:mb-16 max-w-2xl">
@@ -74,7 +60,7 @@ export default function Metrics() {
         <div className="relative mx-auto max-w-5xl overflow-hidden border border-[#26A7FF]/30 bg-[#080A0F] shadow-[0_25px_100px_rgba(0,0,0,0.45)]">
           <div className="grid lg:grid-cols-[260px_1fr]">
             <nav className="border-b border-white/10 p-4 sm:p-6 lg:border-b-0 lg:border-r">
-              <div className="mb-5 font-sans text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/35">Explore by role</div>
+              <div className="mb-5 font-sans text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/60">Explore by role</div>
               <div className="space-y-2">
                 {TECH_STACK.map((group, index) => (
                   <button key={group.label} type="button" onClick={() => selectCluster(index)} className="group flex w-full items-center justify-between border px-4 py-3 text-left transition-all duration-300 hover:translate-x-1" style={{ borderColor: activeIndex === index ? `${group.accent}cc` : 'rgba(255,255,255,0.1)', background: activeIndex === index ? group.tint : 'transparent' }}>
@@ -95,11 +81,11 @@ export default function Metrics() {
                   </div>
                   <span className="font-sans text-sm font-extrabold" style={{ color: TECH_STACK[activeIndex].accent }}>{String(TECH_STACK[activeIndex].items.length).padStart(2, '0')} tools</span>
                 </div>
-                <p className="max-w-xl py-6 font-sans text-sm font-semibold leading-relaxed text-white/60">{TECH_STACK[activeIndex].context}</p>
+                <p className="max-w-xl py-6 font-sans text-sm font-semibold leading-relaxed text-white/75">{TECH_STACK[activeIndex].context}</p>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {TECH_STACK[activeIndex].items.map((item, index) => <div key={item} className="flex items-center gap-3 border border-white/10 bg-white/[0.025] px-4 py-3 transition-all duration-300 hover:border-[#26A7FF]/60 hover:bg-[#26A7FF]/[0.08]"><span className="h-2 w-2 rounded-full" style={{ background: TECH_STACK[activeIndex].accent, boxShadow: `0 0 10px ${TECH_STACK[activeIndex].accent}` }} /><span className="font-sans text-sm font-bold text-white/85">{item}</span><span className="ml-auto font-sans text-[10px] font-bold text-white/30">0{index + 1}</span></div>)}
+                  {TECH_STACK[activeIndex].items.map((item, index) => <div key={item} className="flex items-center gap-3 border border-white/10 bg-white/[0.025] px-4 py-3 transition-all duration-300 hover:border-[#26A7FF]/60 hover:bg-[#26A7FF]/[0.08]"><span className="h-2 w-2 rounded-full" style={{ background: TECH_STACK[activeIndex].accent, boxShadow: `0 0 10px ${TECH_STACK[activeIndex].accent}` }} /><span className="font-sans text-sm font-bold text-white/85">{item}</span><span className="ml-auto font-sans text-[10px] font-bold text-white/60">0{index + 1}</span></div>)}
                 </div>
-                <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-5"><span className="font-sans text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/35">Primary use</span><span className="blue-label uppercase tracking-[0.1em]" style={{ color: TECH_STACK[activeIndex].accent }}>{TECH_STACK[activeIndex].role}</span></div>
+                <div className="mt-8 flex items-center justify-between border-t border-white/10 pt-5"><span className="font-sans text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/60">Primary use</span><span className="blue-label uppercase tracking-[0.1em]" style={{ color: TECH_STACK[activeIndex].accent }}>{TECH_STACK[activeIndex].role}</span></div>
               </div>
             </div>
           </div>

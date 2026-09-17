@@ -13,16 +13,6 @@ const ACHIEVEMENTS = [
     accent: '#178CE0',
   },
   {
-    title: 'LeetCode',
-    description: 'Solved 550+ competitive programming problems, ranking in the top 60.18% among top coders.',
-    accent: '#6BCBFF',
-  },
-  {
-    title: 'CodeChef',
-    description: 'Achieved 1-star coder status with a rating of 1356.',
-    accent: '#26A7FF',
-  },
-  {
     title: 'Technology Infusion Grand Challenge',
     description: 'Finalist in the La Trobe University challenge. Created an open-source real-time video call translation app.',
     accent: '#8ED8FF',
